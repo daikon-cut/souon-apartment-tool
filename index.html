@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>音の伝わりにくさ診断ツール</title>
+  <style>
+    body { font-family: sans-serif; background-color: #f9f9f9; color: #333; padding: 20px; line-height: 1.6; }
+    h1 { font-size: 1.8rem; text-align: center; margin-bottom: 30px; }
+    h2 { font-size: 1.4rem; margin-top: 30px; }
+    .question { margin-top: 20px; }
+    .options { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 5px; }
+    .option { display: flex; align-items: center; gap: 5px; cursor: pointer; background-color: #f0f8ff; padding: 8px 12px; border-radius: 5px; transition: background-color 0.3s, transform 0.2s; }
+    .option:hover { background-color: #d0e8d0; transform: scale(1.02); }
+    .option input { accent-color: #66AA66; }
+    button { margin-top: 30px; padding: 12px 24px; background-color: #66AA66; color: white; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer; transition: background-color 0.3s, transform 0.2s; }
+    button:hover { background-color: #559955; transform: scale(1.05); }
+    .result { margin-top: 30px; background: #f0f8ff; padding: 20px; border-radius: 8px; text-align: center; font-size: 1.2rem; opacity: 0; transform: scale(0.9); transition: opacity 0.5s ease, transform 0.5s ease; }
+    .result.show { opacity: 1; transform: scale(1); }
+    .details { margin-top: 15px; background: #fff; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+    .details-summary { cursor: pointer; }
+    .details ul li { margin-bottom: 5px; }
+  </style>
+</head>
+<body>
+  <img src="images/building_check.png" alt="建物を調査する人" width="150">
+  <h1>音の伝わりにくさ診断ツール</h1>
+
+  <p>このツールは、賃貸物件の「音の伝わりにくさ」を建物の作りから診断するシンプルなツールです。<br>
+  気になるな、と思ったら気軽に試してみてください！</p>
+
+  <img src="images/noise_worry.png" alt="音に悩む人" width="150">
+
+  <div class="question">
+    <strong>Q1. 建物の構造形式は？</strong>
+    <div class="options">
+      <label class="option"><input type="radio" name="structure" value="壁式構造"> 壁式構造</label>
+      <label class="option"><input type="radio" name="structure" value="ラーメン構造"> ラーメン構造</label>
+      <label class="option"><input type="radio" name="structure" value="不明"> 不明</label>
+    </div>
+  </div>
+
+  <div class="question">
+    <strong>Q2. 壁の種類は？</strong>
+    <div class="options">
+      <label class="option"><input type="radio" name="wallType" value="RC"> RC（鉄筋コンクリート）</label>
+      <label class="option"><input type="radio" name="wallType" value="SRC"> SRC（鉄骨鉄筋コンクリート）</label>
+      <label class="option"><input type="radio" name="wallType" value="ALC"> ALC（100mm前後）</label>
+      <label class="option"><input type="radio" name="wallType" value="石膏ボード"> 石膏ボード</label>
+      <label class="option"><input type="radio" name="wallType" value="不明"> 不明</label>
+    </div>
+  </div>
+
+  <div class="question">
+    <strong>Q3. 壁の厚みは？</strong>
+    <div class="options">
+      <label class="option"><input type="radio" name="wallThickness" value="180mm以上"> 180mm以上</label>
+      <label class="option"><input type="radio" name="wallThickness" value="100〜150mm"> 100〜150mm</label>
+      <label class="option"><input type="radio" name="wallThickness" value="100mm未満"> 100mm未満</label>
+      <label class="option"><input type="radio" name="wallThickness" value="不明"> 不明</label>
+    </div>
+  </div>
+
+  <div class="question">
+    <strong>Q4. 部屋に柱は出ていますか？</strong>
+    <div class="options">
+      <label class="option"><input type="radio" name="pillar" value="なし"> 柱は出ていない（アウトフレーム工法）</label>
+      <label class="option"><input type="radio" name="pillar" value="あり"> 柱が出ている（従来工法）</label>
+      <label class="option"><input type="radio" name="pillar" value="不明"> 不明</label>
+    </div>
+  </div>
+
+  <div class="question">
+    <strong>Q5. 外部音リスク（周辺環境）は？</strong>
+    <div class="options">
+      <label class="option"><input type="radio" name="noise" value="静かな住宅地"> 静かな住宅地</label>
+      <label class="option"><input type="radio" name="noise" value="商業地域"> 商業地域</label>
+      <label class="option"><input type="radio" name="noise" value="幹線道路沿い"> 幹線道路沿い</label>
+      <label class="option"><input type="radio" name="noise" value="鉄道沿い"> 鉄道沿い</label>
+      <label class="option"><input type="radio" name="noise" value="不明"> 不明</label>
+    </div>
+  </div>
+
+  <button onclick="calculateScore()">診断スタート！</button>
+
+  <div class="result">
+    <strong>🎧 診断結果（目安）</strong>
+    <p>診断結果はここに表示されます</p>
+    <details class="details">
+      <summary class="details-summary">詳細を見る</summary>
+      <ul></ul>
+    </details>
+  </div>
+
+  <h2>このツールの使い方・特徴</h2>
+  <p>賃貸物件の「音の伝わりやすさ」を建物の作りから診断できるツールです。<br>
+  建物の構造や壁の種類、外部音リスクなどを選んで、どれくらい音が気になりにくいかを★で評価します。<br>
+  SE（ドラムロール・決定音・ロールの閉め音）で楽しく診断できます！<br>
+  分からない項目は「不明」を選んでOK！気軽に試してください。</p>
+  <p>※この診断結果は目安であり、実際の遮音性能を保証するものではありません。必要に応じて管理会社や専門家に確認してください。</p>
+
+</body>
+</html>
