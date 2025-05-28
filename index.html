@@ -22,6 +22,49 @@
     .details ul li { margin-bottom: 5px; }
   </style>
 </head>
+<script>
+  const ratings = {
+    structure: { '壁式構造': 4, 'ラーメン構造': 3, '不明': 3 },
+    wallType: { 'RC': 5, 'SRC': 4, 'ALC': 4, '石膏ボード': 2, '不明': 3 },
+    wallThickness: { '180mm以上': 5, '100〜150mm': 4, '100mm未満': 2, '不明': 3 },
+    pillar: { 'なし': 4, 'あり': 3, '不明': 3 },
+    noise: { '静かな住宅地': 5, '商業地域': 3, '幹線道路沿い': 2, '鉄道沿い': 2, '不明': 3 }
+  };
+
+  const drumroll = new Audio('sounds/drumroll.mp3');
+  const decision = new Audio('sounds/decision.mp3');
+  const rollEnd = new Audio('sounds/roll_end.mp3');
+
+  function calculateScore() {
+    drumroll.play();
+    setTimeout(() => {
+      decision.play();
+      rollEnd.play();
+      let total = 0, count = 0;
+      for (let key in ratings) {
+        const selected = document.querySelector(`input[name='${key}']:checked`);
+        if (selected) { total += ratings[key][selected.value]; count++; }
+      }
+      const average = (count > 0) ? (total / count) : 0;
+      let stars = ''; const fullStars = Math.floor(average);
+      for (let i = 0; i < fullStars; i++) stars += '★';
+      if (average - fullStars >= 0.5) stars += '☆';
+      while (stars.length < 5) stars += '☆';
+      document.querySelector('.result p').innerHTML = `あなたの物件の音の伝わりにくさ（目安）は… <strong>${stars}</strong>`;
+      const details = document.querySelector('.details ul');
+      details.innerHTML = '';
+      for (let key in ratings) {
+        const selected = document.querySelector(`input[name='${key}']:checked`);
+        if (selected) {
+          const level = ratings[key][selected.value];
+          let star = '★'.repeat(level) + '☆'.repeat(5 - level);
+          details.innerHTML += `<li>${key}：${star} - ${selected.value}を選びました。</li>`;
+        }
+      }
+      document.querySelector('.result').classList.add('show');
+    }, 2000);
+  }
+</script>
 <body>
   <img src="images/building_check.png" alt="建物を調査する人" width="150">
   <h1>音の伝わりにくさ診断ツール</h1>
